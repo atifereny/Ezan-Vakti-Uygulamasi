@@ -1,0 +1,27 @@
+name: application
+description: "Ezan Vakti - Namaz Vakitleri Uygulaması"
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # GPS konumu almak için
+  geolocator: ^13.0.0
+  # Konum verisini yerel hafızaya kaydetmek için
+  shared_preferences: ^2.3.0
+  # Aladhan API istekleri için
+  http: ^1.2.0
+  # GPS koordinatından şehir/ilçe adı almak için (reverse geocoding)
+  geocoding: ^3.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
