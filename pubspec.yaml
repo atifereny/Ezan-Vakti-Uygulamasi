@@ -17,6 +17,8 @@ dependencies:
   http: ^1.2.0
   # GPS koordinatından şehir/ilçe adı almak için (reverse geocoding)
   geocoding: ^3.0.0
+  # Ana ekran (launcher) widget'ı için
+  home_widget: ^0.7.0
 
 dev_dependencies:
   flutter_test:

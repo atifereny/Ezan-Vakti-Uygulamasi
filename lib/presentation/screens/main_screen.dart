@@ -7,6 +7,7 @@ import '../../data/services/geocoding_service.dart';
 import '../../data/services/location_service.dart';
 import '../../data/services/prayer_times_service.dart';
 import '../../data/services/storage_service.dart';
+import '../../data/services/widget_service.dart';
 import '../../domain/models/prayer_times.dart';
 import '../../domain/models/saved_location.dart';
 import '../widgets/location_update_dialog.dart';
@@ -27,6 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   final _storageService = StorageService();
   final _prayerTimesService = PrayerTimesService();
   final _geocodingService = GeocodingService();
+  final _widgetService = WidgetService();
 
   // ── Paylaşılan State ──────────────────────────────────────────────────────────
   SavedLocation? _savedLocation;
@@ -131,6 +133,11 @@ class _MainScreenState extends State<MainScreen> {
             ? 'Namaz vakitleri yüklenemedi.\nİnternet bağlantınızı kontrol edin.'
             : null;
       });
+
+      // Yükleme başarılıysa ana ekran widget'ını güncelle
+      if (times != null) {
+        _widgetService.updatePrayerWidget(times: times, city: _city);
+      }
     }
   }
 
