@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Minimalist Ekranlı Zikirmatik Vektörü (Koyu Tema) -->
+  <g>
+    <!-- 1. ANA GÖVDE (Altın Kahve - Koyu Tema Birincil Rengi) -->
+    <path fill="#C49A5C" d="
+      M 160 40
+      C 220 30, 292 30, 352 40
+      C 420 50, 455 100, 450 180
+      C 445 250, 415 285, 410 350
+      C 405 420, 350 472, 256 472
+      C 162 472, 107 420, 102 350
+      C 97 285, 67 250, 62 180
+      C 57 100, 92 50, 160 40 Z" />
+
+    <!-- 2. DIJITAL EKRAN (Açık Renk Dolgulu) -->
+    <rect x="126" y="96" width="260" height="120" rx="24" fill="#1A0F05" opacity="0.4" />
+
+    <!-- Ana Ekran Alanı -->
+    <rect x="131" y="101" width="250" height="110" rx="20" fill="#EDD9B0" />
+
+    <!-- Ekran İç Hafif Parlama/Yansıma Detayı -->
+    <rect x="141" y="111" width="230" height="90" rx="14" fill="#F5E8D0" opacity="0.4" />
+
+    <!-- 3. BÜYÜK BUTON DIŞ ÇERCEVESİ -->
+    <circle cx="256" cy="340" r="72" fill="#1A0F05" opacity="0.3" />
+
+    <!-- 4. BÜYÜK BUTON (Krem Tonu) -->
+    <circle cx="256" cy="340" r="65" fill="#EDD9B0" />
+
+    <!-- 5. BUTON İÇ DETAYI -->
+    <circle cx="256" cy="340" r="54" fill="#F5E8D0" opacity="0.5" />
+  </g>
+</svg>

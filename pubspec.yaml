@@ -19,11 +19,37 @@ dependencies:
   geocoding: ^3.0.0
   # Ana ekran (launcher) widget'ı için
   home_widget: ^0.7.0
+  # Namaz vakti ve kerahat bildirimleri için
+  flutter_local_notifications: ^17.2.4
+  timezone: ^0.9.4
+  # SVG görseller için
+  flutter_svg: ^2.0.10
+  # Yakın cami haritası için
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  url_launcher: ^6.3.0
+  # Hicri takvim dönüşümü için
+  hijri: ^3.0.1
+  # Pusula sensörü için
+  flutter_compass: ^0.8.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/cami.svg
+    - assets/images/cami_dark.svg
+    - assets/images/zikirmatik.svg
+    - assets/images/zikirmatik_dark.svg
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/images/launcher_icon.png"
+  min_sdk_android: 21

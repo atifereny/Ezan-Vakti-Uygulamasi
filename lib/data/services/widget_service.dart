@@ -28,8 +28,9 @@ class WidgetService {
         next != null ? '${next.name}  ${next.time}' : '',
       );
 
-      // Widget'ı yenile
+      // Her iki widget varyantını yenile (açık + koyu tema)
       await HomeWidget.updateWidget(androidName: _androidWidgetName);
+      await HomeWidget.updateWidget(androidName: 'PrayerWidgetDark');
     } catch (_) {
       // Widget henüz eklenmemişse veya izin yoksa hata fırlatmaz
     }

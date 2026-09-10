@@ -4,8 +4,18 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- Aladhan API erişimi için internet izni -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Bildirim göndermek için (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Namaz vakitlerinde tam zamanında bildirim için -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <!-- Cihaz yeniden başlatıldığında bildirimleri yeniden planlamak için -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Doze modu pil optimizasyonundan muafiyet için -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <application
-        android:label="application"
+        android:label="Ezan Vakti"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -36,19 +46,70 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <!-- Ana ekran widget'ı -->
+        <!-- Ana ekran widget'ı - Açık Tema -->
         <receiver
-            android:name=".PrayerWidget"
+            android:name="com.example.application.PrayerWidget"
             android:exported="true"
-            android:label="Ezan Vakti Widget">
+            android:label="Ezan Vakti (Açık)">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="es.antonborri.home_widget.action.UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/prayer_widget_info" />
         </receiver>
+
+        <!-- Ana ekran widget'ı - Koyu Tema -->
+        <receiver
+            android:name="com.example.application.PrayerWidgetDark"
+            android:exported="true"
+            android:label="Ezan Vakti (Koyu)">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/prayer_widget_info_dark" />
+        </receiver>
+
+        <!-- Kendi alarm alıcımız: plugin'den bağımsız, crash-safe -->
+        <receiver
+            android:name="com.example.application.PrayerAlarmReceiver"
+            android:exported="false" />
+
+        <!-- Telefon yeniden başladığında alarmları cache'den geri yükler -->
+        <receiver
+            android:name="com.example.application.PrayerBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- flutter_local_notifications: zamanlanmış bildirim alarmı tetiklendiğinde bildirimi gösterir -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
+            android:exported="false" />
+
+        <!-- flutter_local_notifications: cihaz yeniden başladığında planlanmış bildirimleri yeniden kurar -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- flutter_local_notifications: bildirim aksiyon butonları için -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
+            android:exported="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

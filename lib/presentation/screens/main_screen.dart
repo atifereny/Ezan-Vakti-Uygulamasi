@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -7,12 +9,15 @@ import '../../data/services/geocoding_service.dart';
 import '../../data/services/location_service.dart';
 import '../../data/services/prayer_times_service.dart';
 import '../../data/services/storage_service.dart';
+import '../../data/services/notification_service.dart';
 import '../../data/services/widget_service.dart';
 import '../../domain/models/prayer_times.dart';
 import '../../domain/models/saved_location.dart';
 import '../widgets/location_update_dialog.dart';
+import '../../domain/models/notification_prefs.dart';
+import 'features_screen.dart';
+import 'ayarlar_screen.dart';
 import 'prayer_times_screen.dart';
-import 'profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -34,11 +39,15 @@ class _MainScreenState extends State<MainScreen> {
   SavedLocation? _savedLocation;
   Position? _currentPosition;
   PrayerTimes? _prayerTimes;
+  String? _tomorrowFajr;
   String _city = '';
   String _district = '';
   bool _isPrayerLoading = true;
   String? _prayerError;
   bool _isRefreshing = false;
+  Timer? _midnightTimer;
+  NotificationPrefs _notifPrefs = NotificationPrefs.defaults();
+  List<PrayerTimes> _upcomingDays = [];
 
   @override
   void initState() {
@@ -46,20 +55,29 @@ class _MainScreenState extends State<MainScreen> {
     _initialize();
   }
 
+  @override
+  void dispose() {
+    _midnightTimer?.cancel();
+    NotificationService.stopLiveNotification();
+    super.dispose();
+  }
+
   // ── Başlatma: önce cache, sonra arka planda GPS ───────────────────────────────
 
   Future<void> _initialize() async {
     // 1. Yerel hafızadan kaydedilmiş veriyi anında yükle
-    final saved = await _storageService.loadLocation();
-    final cityInfo = await _storageService.loadCityInfo();
+    final saved      = await _storageService.loadLocation();
+    final cityInfo   = await _storageService.loadCityInfo();
+    final notifPrefs = await _storageService.loadNotifPrefs();
 
-    if (saved != null && mounted) {
-      setState(() => _savedLocation = saved);
-    }
-    if (cityInfo != null && mounted) {
+    if (mounted) {
       setState(() {
-        _city = cityInfo.city;
-        _district = cityInfo.district;
+        if (saved != null) _savedLocation = saved;
+        if (cityInfo != null) {
+          _city     = cityInfo.city;
+          _district = cityInfo.district;
+        }
+        _notifPrefs = notifPrefs;
       });
     }
 
@@ -67,16 +85,35 @@ class _MainScreenState extends State<MainScreen> {
     if (saved != null) {
       await _loadPrayerTimes(saved.latitude, saved.longitude);
 
-      // Şehir bilgisi hiç kaydedilmemişse kayıtlı koordinattan hemen türet.
-      // (GPS beklenmez; geocoding genellikle network geocoder ile hızlı çalışır.)
       if (cityInfo == null) {
         await _fetchAndSaveCityInfo(saved.latitude, saved.longitude);
       }
     }
 
-    // 3. GPS'i arka planda kontrol et (ağır iş, kullanıcıyı bekletmez)
+    // 3. Bildirim izni iste (Android 13+, ilk açılışta sistem dialogu gösterir)
+    await NotificationService.requestPermission();
+
+    // 4. Pil optimizasyonu muafiyeti iste (Doze modunda bildirimlerin gelmesi için)
+    final isIgnoring = await NotificationService.isIgnoringBatteryOptimizations();
+    if (!isIgnoring) {
+      await NotificationService.requestIgnoreBatteryOptimizations();
+    }
+
+    // 5. GPS'i arka planda kontrol et (ağır iş, kullanıcıyı bekletmez)
     await _checkGpsInBackground(savedLocation: saved);
   }
+
+  Future<void> _onNotifPrefsChanged(NotificationPrefs prefs) async {
+    if (!mounted) return;
+    setState(() => _notifPrefs = prefs);
+    await _storageService.saveNotifPrefs(prefs);
+    if (_upcomingDays.isNotEmpty) {
+      await NotificationService.scheduleUpcoming(_upcomingDays, prefs: prefs);
+    }
+  }
+
+  Future<void> _togglePrayerNotif(String prayer, bool enabled) =>
+      _onNotifPrefsChanged(_notifPrefs.copyWithEnabled(prayer, enabled));
 
   Future<void> _checkGpsInBackground({
     required SavedLocation? savedLocation,
@@ -134,11 +171,43 @@ class _MainScreenState extends State<MainScreen> {
             : null;
       });
 
-      // Yükleme başarılıysa ana ekran widget'ını güncelle
+      // Yükleme başarılıysa widget'ı, bildirimleri ve yarınki vakti güncelle
       if (times != null) {
         _widgetService.updatePrayerWidget(times: times, city: _city);
+        // Önümüzdeki günleri cache'den çek, state'e kaydet ve planla
+        _prayerTimesService.getUpcomingDays(lat, lng).then((days) {
+          if (mounted) setState(() => _upcomingDays = days);
+          NotificationService.scheduleUpcoming(days, prefs: _notifPrefs);
+        });
+        NotificationService.startLiveNotification(times, tomorrowFajr: _tomorrowFajr);
+        _loadTomorrowFajr(lat, lng);
+        _scheduleMidnightReload();
       }
     }
+  }
+
+  Future<void> _loadTomorrowFajr(double lat, double lng) async {
+    final tomorrow = await _prayerTimesService.getTomorrowPrayerTimes(lat, lng);
+    if (!mounted) return;
+    setState(() => _tomorrowFajr = tomorrow?.fajr);
+    // tomorrowFajr geldi → canlı sayacı yeniden başlat (Yatsı sonrası için gerekli)
+    if (_prayerTimes != null) {
+      NotificationService.startLiveNotification(
+        _prayerTimes!,
+        tomorrowFajr: tomorrow?.fajr,
+      );
+    }
+  }
+
+  void _scheduleMidnightReload() {
+    _midnightTimer?.cancel();
+    final now = DateTime.now();
+    final midnight = DateTime(now.year, now.month, now.day + 1);
+    _midnightTimer = Timer(midnight.difference(now), () {
+      if (mounted && _savedLocation != null) {
+        _loadPrayerTimes(_savedLocation!.latitude, _savedLocation!.longitude);
+      }
+    });
   }
 
   Future<void> _fetchAndSaveCityInfo(double lat, double lng) async {
@@ -230,94 +299,71 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // IndexedStack sekme değişiminde state'i korur (yeniden build etmez)
+      appBar: AppBar(
+        title: const Text('Ezan Vakti'),
+        actions: [
+          IconButton(
+            icon: _isRefreshing
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  )
+                : const Icon(Icons.refresh),
+            onPressed: _isRefreshing ? null : _refreshLocation,
+          ),
+        ],
+      ),
+      // IndexedStack sekme değişiminde state'i korur
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          // Sol sekme: ileride eklenecek özellik (Kıble vb.)
-          const _PlaceholderScreen(
-            title: 'Kıble',
-            icon: Icons.explore,
-            message: 'Kıble yönü özelliği yakında geliyor.',
-          ),
-          // Merkez sekme: Namaz Vakitleri
+          const FeaturesScreen(),
           PrayerTimesScreen(
-            prayerTimes: _prayerTimes,
-            city: _city,
-            district: _district,
-            isLoading: _isPrayerLoading,
-            error: _prayerError,
+            prayerTimes:   _prayerTimes,
+            city:          _city,
+            district:      _district,
+            isLoading:     _isPrayerLoading,
+            error:         _prayerError,
+            tomorrowFajr:  _tomorrowFajr,
+            notifPrefs:    _notifPrefs,
+            onNotifToggle: _togglePrayerNotif,
           ),
-          // Sağ sekme: Profil
-          ProfileScreen(
-            savedLocation: _savedLocation,
-            currentPosition: _currentPosition,
-            city: _city,
-            district: _district,
-            isRefreshing: _isRefreshing,
-            onRefresh: _refreshLocation,
+          AyarlarScreen(
+            savedLocation:        _savedLocation,
+            currentPosition:      _currentPosition,
+            city:                 _city,
+            district:             _district,
+            isRefreshing:         _isRefreshing,
+            onRefresh:            _refreshLocation,
+            notifPrefs:           _notifPrefs,
+            onNotifPrefsChanged:  _onNotifPrefsChanged,
           ),
         ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (i) => setState(() => _selectedIndex = i),
-        indicatorColor: const Color(0xFF1B5E20).withAlpha(30),
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.explore_outlined),
-            selectedIcon: Icon(Icons.explore, color: Color(0xFF1B5E20)),
-            label: 'Kıble',
+            icon: Icon(Icons.apps_outlined),
+            selectedIcon: Icon(Icons.apps),
+            label: 'Özellikler',
           ),
           NavigationDestination(
             icon: Icon(Icons.mosque_outlined),
-            selectedIcon: Icon(Icons.mosque, color: Color(0xFF1B5E20)),
+            selectedIcon: Icon(Icons.mosque),
             label: 'Vakitler',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person, color: Color(0xFF1B5E20)),
-            label: 'Profil',
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
+            label: 'Ayarlar',
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ── Placeholder Sekme ─────────────────────────────────────────────────────────
-
-class _PlaceholderScreen extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final String message;
-
-  const _PlaceholderScreen({
-    required this.title,
-    required this.icon,
-    required this.message,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: const Color(0xFF1B5E20),
-        foregroundColor: Colors.white,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 72, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              style: TextStyle(color: Colors.grey[600], fontSize: 15),
-            ),
-          ],
-        ),
       ),
     );
   }

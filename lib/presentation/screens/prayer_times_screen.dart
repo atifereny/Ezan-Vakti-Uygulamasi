@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hijri/hijri_calendar.dart';
 
+import '../../domain/models/notification_prefs.dart';
 import '../../domain/models/prayer_times.dart';
 import '../widgets/countdown_card.dart';
 import '../widgets/prayer_times_card.dart';
@@ -10,6 +13,9 @@ class PrayerTimesScreen extends StatelessWidget {
   final String district;
   final bool isLoading;
   final String? error;
+  final String? tomorrowFajr;
+  final NotificationPrefs notifPrefs;
+  final void Function(String prayer, bool enabled) onNotifToggle;
 
   const PrayerTimesScreen({
     super.key,
@@ -18,29 +24,27 @@ class PrayerTimesScreen extends StatelessWidget {
     required this.district,
     required this.isLoading,
     this.error,
+    this.tomorrowFajr,
+    required this.notifPrefs,
+    required this.onNotifToggle,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ezan Vakti'),
-        backgroundColor: const Color(0xFF1B5E20),
-        foregroundColor: Colors.white,
-      ),
-      body: _buildBody(),
-    );
+    return Scaffold(body: _buildBody(context));
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     if (isLoading) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: Color(0xFF1B5E20)),
-            SizedBox(height: 16),
-            Text('Namaz vakitleri yükleniyor...'),
+            CircularProgressIndicator(color: cs.primary),
+            const SizedBox(height: 16),
+            const Text('Namaz vakitleri yükleniyor...'),
           ],
         ),
       );
@@ -70,28 +74,70 @@ class PrayerTimesScreen extends StatelessWidget {
       return const Center(child: Text('Veri bulunamadı.'));
     }
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Column(
       children: [
-        _InfoCard(city: city, district: district),
-        const SizedBox(height: 12),
-        CountdownCard(prayerTimes: prayerTimes!),
-        const SizedBox(height: 12),
-        PrayerTimesCard(prayerTimes: prayerTimes!),
+        // ── Hero: SVG cami arka planı + sayaç ──────────────────────────────
+        AspectRatio(
+          aspectRatio: 8 / 5,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Opacity(
+                opacity: 0.5,
+                child: Transform.translate(
+                  offset: const Offset(0, 18),
+                  child: SvgPicture.asset(
+                    isDark
+                        ? 'assets/images/cami_dark.svg'
+                        : 'assets/images/cami.svg',
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              ),
+              // Konum + tarih bilgisi (üst)
+              Positioned(
+                top: 10, left: 16, right: 16,
+                child: _HeroInfoRow(city: city, district: district),
+              ),
+              // Sayaç (merkez)
+              Center(
+                child: CountdownCard(
+                  prayerTimes: prayerTimes!,
+                  tomorrowFajr: tomorrowFajr,
+                  heroMode: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        // ── Namaz vakitleri listesi ─────────────────────────────────────────
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+            child: PrayerTimesCard(
+              prayerTimes:   prayerTimes!,
+              notifPrefs:    notifPrefs,
+              onNotifToggle: onNotifToggle,
+            ),
+          ),
+        ),
       ],
     );
   }
 }
 
-// ── Tarih + Konum kartı ───────────────────────────────────────────────────────
+// ── Hero içi konum + tarih satırı ────────────────────────────────────────────
 
-class _InfoCard extends StatelessWidget {
+class _HeroInfoRow extends StatelessWidget {
   final String city;
   final String district;
 
-  static const _months = [
-    'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık',
+  static const _hijriMonths = [
+    'Muharrem', 'Safer', 'Rebiülevvel', 'Rebiülahir',
+    'Cemaziyelevvel', 'Cemaziyelahir', 'Recep', 'Şaban',
+    'Ramazan', 'Şevval', 'Zilkade', 'Zilhicce',
   ];
 
   static const _days = [
@@ -99,76 +145,74 @@ class _InfoCard extends StatelessWidget {
     'Cuma', 'Cumartesi', 'Pazar',
   ];
 
-  const _InfoCard({required this.city, required this.district});
+  const _HeroInfoRow({required this.city, required this.district});
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final muted = cs.onSurface.withValues(alpha: 0.6);
+
     final now = DateTime.now();
     final dayName = _days[now.weekday - 1];
-    final dateStr = '${now.day} ${_months[now.month - 1]} ${now.year}';
+    final h = HijriCalendar.fromDate(now);
+    final hijriStr = '${h.hDay} ${_hijriMonths[h.hMonth - 1]} ${h.hYear}';
 
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Sol: Hicri takvim
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Sol: Tarih
-            const Icon(Icons.calendar_today,
-                color: Color(0xFF1B5E20), size: 22),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  dayName,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                Text(
-                  dateStr,
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-              ],
+            Text(
+              dayName,
+              style: TextStyle(
+                color: cs.onSurface,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-
-            const Spacer(),
-
-            // Ayraç
-            Container(
-              width: 1,
-              height: 36,
-              color: Colors.grey[300],
-            ),
-            const SizedBox(width: 14),
-
-            // Sağ: Konum
-            const Icon(Icons.location_on,
-                color: Color(0xFF1B5E20), size: 22),
-            const SizedBox(width: 6),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  city.isNotEmpty ? city : '—',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                if (district.isNotEmpty)
-                  Text(
-                    district,
-                    style:
-                        const TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-              ],
+            Text(
+              hijriStr,
+              style: TextStyle(
+                color: muted,
+                fontSize: 11,
+              ),
             ),
           ],
         ),
-      ),
+        const Spacer(),
+        // Sağ: Konum
+        if (city.isNotEmpty)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.location_on, color: cs.primary, size: 14),
+              const SizedBox(width: 4),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    city,
+                    style: TextStyle(
+                      color: cs.onSurface,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (district.isNotEmpty)
+                    Text(
+                      district,
+                      style: TextStyle(
+                        color: muted,
+                        fontSize: 11,
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+      ],
     );
   }
 }

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <!-- #EDD9B0 Renginde Vektörel Cami -->
+  <g fill="#C8A870">
+    
+    <!-- ================= 1. TABAN & KUBBELER ================= -->
+    <!-- Zemin Tabanı -->
+    <rect x="80" y="460" width="640" height="40" />
+    
+    <!-- Yan Küçük Kubbeler -->
+    <path d="M 120 460 A 60 60 0 0 1 240 460 Z" />
+    <path d="M 560 460 A 60 60 0 0 1 680 460 Z" />
+    
+    <!-- Ana Merkezi Kubbe -->
+    <path d="M 220 460 A 180 180 0 0 1 580 460 Z" />
+
+    <!-- ================= 2. KUBBEYE YAPIŞIK ALEM VE YATAY HİLAL ================= -->
+    <!-- Alem Taban Boğumları -->
+    <rect x="392" y="260" width="16" height="21" rx="3" />
+    <circle cx="400" cy="252" r="7" />
+    <rect x="397" y="225" width="6" height="27" />
+    <circle cx="400" cy="221" r="5" />
+    <rect x="398" y="195" width="4" height="26" />
+    
+    <!-- TEPEYE YAPIŞIK YATAY HİLAL (Uçları Gökyüzüne Bakan Net Çizim) -->
+    <!-- Dış yay alta kavis yapar, iç yay ile birleşip uçları yukarı bakan hilal oluşturur -->
+    <path d="M 382 182 
+             C 382 205, 418 205, 418 182 
+             C 412 196, 388 196, 382 182 Z" />
+
+    <!-- ================= 3. SOL MİNARE ================= -->
+    <!-- Gövde -->
+    <rect x="100" y="180" width="30" height="280" />
+    <!-- 1. Şerefe -->
+    <path d="M 92 310 L 138 310 L 130 325 L 100 325 Z" />
+    <!-- 2. Şerefe (Üst) -->
+    <path d="M 92 180 L 138 180 L 130 195 L 100 195 Z" />
+    <!-- Minare Petek (Külah Altı) -->
+    <rect x="103" y="120" width="24" height="60" />
+    <!-- Külah (Sivri Çatı) -->
+    <path d="M 98 120 L 115 40 L 132 120 Z" />
+    <!-- Sol Minare Tepesindeki Küçük Yatay Hilal -->
+    <path d="M 108 34 C 108 44, 122 44, 122 34 C 119 40, 111 40, 108 34 Z" />
+
+    <!-- ================= 4. SAĞ MİNARE ================= -->
+    <!-- Gövde -->
+    <rect x="670" y="180" width="30" height="280" />
+    <!-- 1. Şerefe -->
+    <path d="M 662 310 L 708 310 L 700 325 L 670 325 Z" />
+    <!-- 2. Şerefe (Üst) -->
+    <path d="M 662 180 L 708 180 L 700 195 L 670 195 Z" />
+    <!-- Minare Petek (Külah Altı) -->
+    <rect x="673" y="120" width="24" height="60" />
+    <!-- Külah (Sivri Çatı) -->
+    <path d="M 668 120 L 685 40 L 702 120 Z" />
+    <!-- Sağ Minare Tepesindeki Küçük Yatay Hilal -->
+    <path d="M 678 34 C 678 44, 692 44, 692 34 C 689 40, 681 40, 678 34 Z" />
+
+  </g>
+</svg>

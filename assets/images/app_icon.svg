@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Yuvarlatılmış Siyah Arka Plan (Arka planı tamamen kare yapmak istersen rx="0" yapabilirsin) -->
+  <rect width="512" height="512" rx="112" fill="#F5EDD6" />
+
+  <!-- Uygulama İkonu Cami Çizimi (#EDD9B0) -->
+  <g fill="#7A5C2E">
+    <!-- Taban Zemin -->
+    <rect x="76" y="390" width="360" height="20" rx="4" />
+
+    <!-- Yan Kubbeler -->
+    <path d="M 116 390 A 40 40 0 0 1 196 390 Z" />
+    <path d="M 316 390 A 40 40 0 0 1 396 390 Z" />
+
+    <!-- Ana Kubbe -->
+    <path d="M 176 390 A 80 80 0 0 1 336 390 Z" />
+
+    <!-- Kubbe Üstü Alem ve Yatay Hilal -->
+    <rect x="252" y="280" width="8" height="30" rx="2" />
+    <circle cx="256" cy="274" r="5" />
+    <rect x="254" y="250" width="4" height="20" />
+    <!-- Uçları Yukarı Bakan Yatay Hilal -->
+    <path d="M 242 242 C 242 258, 270 258, 270 242 C 265 252, 247 252, 242 242 Z" />
+
+    <!-- Sol Minare -->
+    <rect x="110" y="210" width="20" height="180" />
+    <path d="M 104 300 L 136 300 L 130 310 L 110 310 Z" />
+    <path d="M 104 210 L 136 210 L 130 220 L 110 220 Z" />
+    <rect x="112" y="170" width="16" height="40" />
+    <path d="M 108 170 L 120 110 L 132 170 Z" />
+    <!-- Minare Yatay Hilali -->
+    <path d="M 113 105 C 113 112, 127 112, 127 105 C 124 109, 116 109, 113 105 Z" />
+
+    <!-- Sağ Minare -->
+    <rect x="382" y="210" width="20" height="180" />
+    <path d="M 376 300 L 408 300 L 402 310 L 382 310 Z" />
+    <path d="M 376 210 L 408 210 L 402 220 L 382 220 Z" />
+    <rect x="384" y="170" width="16" height="40" />
+    <path d="M 380 170 L 392 110 L 404 170 Z" />
+    <!-- Minare Yatay Hilali -->
+    <path d="M 385 105 C 385 112, 399 112, 399 105 C 396 109, 388 109, 385 105 Z" />
+  </g>
+</svg>

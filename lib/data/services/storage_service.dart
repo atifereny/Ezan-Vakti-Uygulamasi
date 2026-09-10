@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/app_constants.dart';
+import '../../domain/models/notification_prefs.dart';
 import '../../domain/models/saved_location.dart';
 
 class StorageService {
@@ -64,5 +65,46 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_cityKey);
     await prefs.remove(_districtKey);
+  }
+
+  // ── Bildirim tercihleri ───────────────────────────────────────────────────────
+
+  static const _notifEnabledPrefix  = 'notif_enabled_';
+  static const _notifEarlyPrefix    = 'notif_early_';
+  static const _notifEarlyMinPrefix = 'notif_early_min_';
+  static const _notifKerahatPrefix  = 'notif_kerahat_';
+
+  Future<void> saveNotifPrefs(NotificationPrefs notifPrefs) async {
+    final prefs = await SharedPreferences.getInstance();
+    for (final prayer in NotificationPrefs.prayers) {
+      await prefs.setBool('$_notifEnabledPrefix$prayer',  notifPrefs.isEnabled(prayer));
+      await prefs.setBool('$_notifEarlyPrefix$prayer',    notifPrefs.isEarlyEnabled(prayer));
+      await prefs.setInt('$_notifEarlyMinPrefix$prayer',  notifPrefs.earlyMinutesOf(prayer));
+    }
+    for (final key in NotificationPrefs.kerahatKeys) {
+      await prefs.setBool('$_notifKerahatPrefix$key', notifPrefs.isKerahatEnabled(key));
+    }
+  }
+
+  Future<NotificationPrefs> loadNotifPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    return NotificationPrefs(
+      enabled: {
+        for (final prayer in NotificationPrefs.prayers)
+          prayer: prefs.getBool('$_notifEnabledPrefix$prayer') ?? true,
+      },
+      earlyEnabled: {
+        for (final prayer in NotificationPrefs.prayers)
+          prayer: prefs.getBool('$_notifEarlyPrefix$prayer') ?? true,
+      },
+      earlyMinutes: {
+        for (final prayer in NotificationPrefs.prayers)
+          prayer: prefs.getInt('$_notifEarlyMinPrefix$prayer') ?? 15,
+      },
+      kerahatEnabled: {
+        for (final key in NotificationPrefs.kerahatKeys)
+          key: prefs.getBool('$_notifKerahatPrefix$key') ?? true,
+      },
+    );
   }
 }

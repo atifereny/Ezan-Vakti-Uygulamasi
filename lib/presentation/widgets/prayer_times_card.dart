@@ -1,56 +1,89 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../domain/models/notification_prefs.dart';
 import '../../domain/models/prayer_times.dart';
 
-class PrayerTimesCard extends StatelessWidget {
+class PrayerTimesCard extends StatefulWidget {
   final PrayerTimes prayerTimes;
+  final NotificationPrefs notifPrefs;
+  final void Function(String prayer, bool enabled) onNotifToggle;
 
-  const PrayerTimesCard({super.key, required this.prayerTimes});
+  const PrayerTimesCard({
+    super.key,
+    required this.prayerTimes,
+    required this.notifPrefs,
+    required this.onNotifToggle,
+  });
+
+  @override
+  State<PrayerTimesCard> createState() => _PrayerTimesCardState();
+}
+
+class _PrayerTimesCardState extends State<PrayerTimesCard> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final nextPrayer = prayerTimes.nextPrayer;
+    final cs = Theme.of(context).colorScheme;
+    final nextPrayer = widget.prayerTimes.nextPrayer;
 
     return Card(
-      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Başlık
-            const Row(
+            Row(
               children: [
-                Icon(Icons.mosque, color: Color(0xFF1B5E20), size: 24),
-                SizedBox(width: 8),
-                Text(
+                Icon(Icons.mosque, color: cs.primary, size: 24),
+                const SizedBox(width: 8),
+                const Text(
                   'Bugünün Namaz Vakitleri',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
               ],
             ),
             const Divider(height: 20),
 
             // Vakit satırları
-            ...prayerTimes.entries.map(
+            ...widget.prayerTimes.entries.map(
               (entry) => _PrayerRow(
-                entry: entry,
-                isNext: entry.name == nextPrayer?.name,
+                entry:    entry,
+                isNext:   entry.name == nextPrayer?.name,
+                notifOn:  widget.notifPrefs.isEnabled(entry.name),
+                onToggle: () => widget.onNotifToggle(
+                  entry.name,
+                  !widget.notifPrefs.isEnabled(entry.name),
+                ),
               ),
             ),
 
             // Yatsı sonrası mesajı
             if (nextPrayer == null)
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
                 child: Text(
                   'Tüm vakitler geçti. Yarın İmsak: yeni gün başlıyor.',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey,
+                    color: cs.onSurface.withValues(alpha: 0.55),
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -65,19 +98,27 @@ class PrayerTimesCard extends StatelessWidget {
 class _PrayerRow extends StatelessWidget {
   final PrayerEntry entry;
   final bool isNext;
+  final bool notifOn;
+  final VoidCallback onToggle;
 
-  const _PrayerRow({required this.entry, required this.isNext});
+  const _PrayerRow({
+    required this.entry,
+    required this.isNext,
+    required this.notifOn,
+    required this.onToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
-    const green = Color(0xFF1B5E20);
+    final cs = Theme.of(context).colorScheme;
+    final muted = cs.onSurface.withValues(alpha: 0.5);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       decoration: isNext
           ? BoxDecoration(
-              color: const Color(0x1A1B5E20), // %10 yeşil arka plan
+              color: cs.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             )
           : null,
@@ -87,7 +128,7 @@ class _PrayerRow extends StatelessWidget {
           Icon(
             _iconFor(entry.name),
             size: 20,
-            color: isNext ? green : Colors.grey,
+            color: isNext ? cs.primary : muted,
           ),
           const SizedBox(width: 12),
 
@@ -98,7 +139,7 @@ class _PrayerRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: isNext ? FontWeight.bold : FontWeight.normal,
-                color: isNext ? green : null,
+                color: isNext ? cs.primary : cs.onSurface,
               ),
             ),
           ),
@@ -107,10 +148,9 @@ class _PrayerRow extends StatelessWidget {
           if (isNext)
             Container(
               margin: const EdgeInsets.only(right: 8),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
               decoration: BoxDecoration(
-                color: green,
+                color: cs.primary,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Text(
@@ -125,7 +165,24 @@ class _PrayerRow extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: isNext ? FontWeight.bold : FontWeight.normal,
-              color: isNext ? green : null,
+              color: isNext ? cs.primary : cs.onSurface,
+            ),
+          ),
+
+          const SizedBox(width: 4),
+
+          // Bildirim toggle ikonu
+          GestureDetector(
+            onTap: onToggle,
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Icon(
+                notifOn
+                    ? Icons.notifications_active
+                    : Icons.notifications_off_outlined,
+                size: 18,
+                color: notifOn ? cs.primary : muted,
+              ),
             ),
           ),
         ],
@@ -135,20 +192,13 @@ class _PrayerRow extends StatelessWidget {
 
   IconData _iconFor(String name) {
     switch (name) {
-      case 'İmsak':
-        return Icons.nights_stay;
-      case 'Güneş':
-        return Icons.wb_sunny;
-      case 'Öğle':
-        return Icons.wb_sunny_outlined;
-      case 'İkindi':
-        return Icons.cloud_queue;
-      case 'Akşam':
-        return Icons.wb_twilight;
-      case 'Yatsı':
-        return Icons.dark_mode;
-      default:
-        return Icons.schedule;
+      case 'İmsak':  return Icons.nights_stay;
+      case 'Güneş':  return Icons.wb_sunny;
+      case 'Öğle':   return Icons.wb_sunny_outlined;
+      case 'İkindi': return Icons.cloud_queue;
+      case 'Akşam':  return Icons.wb_twilight;
+      case 'Yatsı':  return Icons.dark_mode;
+      default:       return Icons.schedule;
     }
   }
 }
