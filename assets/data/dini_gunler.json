@@ -1,0 +1,587 @@
+{
+"source":"https://mobil.diyanet.gov.tr/mobile/dinigunler/dinigunler.html",
+"updated":"2026-10-20",
+"days":[
+{
+"date":"2025-01-01",
+"endDate":null,
+"name":"Üç Ayların Başlangıcı",
+"hijri":"1 Receb",
+"kind":"ozel"
+},
+{
+"date":"2025-01-02",
+"endDate":null,
+"name":"Regaib Kandili",
+"hijri":"2 Receb",
+"kind":"kandil"
+},
+{
+"date":"2025-01-26",
+"endDate":null,
+"name":"Miraç Kandili",
+"hijri":"26 Receb",
+"kind":"kandil"
+},
+{
+"date":"2025-01-31",
+"endDate":null,
+"name":"Şaban Başlangıcı",
+"hijri":"1 Şaban",
+"kind":"ay"
+},
+{
+"date":"2025-02-13",
+"endDate":null,
+"name":"Berat Kandili",
+"hijri":"14 Şaban",
+"kind":"kandil"
+},
+{
+"date":"2025-03-01",
+"endDate":null,
+"name":"Ramazan Başlangıcı",
+"hijri":"1 Ramazan",
+"kind":"ozel"
+},
+{
+"date":"2025-03-26",
+"endDate":null,
+"name":"Kadir Gecesi",
+"hijri":"26 Ramazan",
+"kind":"kandil"
+},
+{
+"date":"2025-03-29",
+"endDate":null,
+"name":"Ramazan Bayramı Arefesi",
+"hijri":"29 Ramazan",
+"kind":"arefe"
+},
+{
+"date":"2025-03-30",
+"endDate":"2025-04-01",
+"name":"Ramazan Bayramı",
+"hijri":"1-2-3 Şevval",
+"kind":"bayram"
+},
+{
+"date":"2025-04-29",
+"endDate":null,
+"name":"Zilkade Başlangıcı",
+"hijri":"1 Zilkade",
+"kind":"ay"
+},
+{
+"date":"2025-05-28",
+"endDate":null,
+"name":"Zilhicce Başlangıcı",
+"hijri":"1 Zilhicce",
+"kind":"ay"
+},
+{
+"date":"2025-06-05",
+"endDate":null,
+"name":"Kurban Bayramı Arefesi",
+"hijri":"9 Zilhicce",
+"kind":"arefe"
+},
+{
+"date":"2025-06-06",
+"endDate":"2025-06-09",
+"name":"Kurban Bayramı",
+"hijri":"10-11-12-13 Zilhicce",
+"kind":"bayram"
+},
+{
+"date":"2025-06-26",
+"endDate":null,
+"name":"Hicri Yılbaşı",
+"hijri":"1 Muharrem",
+"kind":"ozel"
+},
+{
+"date":"2025-07-05",
+"endDate":null,
+"name":"Aşure Günü",
+"hijri":"10 Muharrem",
+"kind":"ozel"
+},
+{
+"date":"2025-07-26",
+"endDate":null,
+"name":"Safer Başlangıcı",
+"hijri":"1 Safer",
+"kind":"ay"
+},
+{
+"date":"2025-08-24",
+"endDate":null,
+"name":"R.Evvel Başlangıcı",
+"hijri":"1 R.Evvel",
+"kind":"ay"
+},
+{
+"date":"2025-09-03",
+"endDate":null,
+"name":"Mevlid Kandili",
+"hijri":"11 R.Evvel",
+"kind":"kandil"
+},
+{
+"date":"2025-09-23",
+"endDate":null,
+"name":"R.Ahir Başlangıcı",
+"hijri":"1 R.Ahir",
+"kind":"ay"
+},
+{
+"date":"2025-10-23",
+"endDate":null,
+"name":"C.Evvel Başlangıcı",
+"hijri":"1 C.Evvel",
+"kind":"ay"
+},
+{
+"date":"2025-11-21",
+"endDate":null,
+"name":"C.Ahir Başlangıcı",
+"hijri":"1 C.Ahir",
+"kind":"ay"
+},
+{
+"date":"2025-12-21",
+"endDate":null,
+"name":"Üç Ayların Başlangıcı",
+"hijri":"1 Receb",
+"kind":"ozel"
+},
+{
+"date":"2025-12-25",
+"endDate":null,
+"name":"Regaib Kandili",
+"hijri":"5 Receb",
+"kind":"kandil"
+},
+{
+"date":"2026-01-15",
+"endDate":null,
+"name":"Miraç Kandili",
+"hijri":"26 Receb",
+"kind":"kandil"
+},
+{
+"date":"2026-01-20",
+"endDate":null,
+"name":"Şaban Başlangıcı",
+"hijri":"1 Şaban",
+"kind":"ay"
+},
+{
+"date":"2026-02-02",
+"endDate":null,
+"name":"Berat Kandili",
+"hijri":"14 Şaban",
+"kind":"kandil"
+},
+{
+"date":"2026-02-19",
+"endDate":null,
+"name":"Ramazan Başlangıcı",
+"hijri":"1 Ramazan",
+"kind":"ozel"
+},
+{
+"date":"2026-03-16",
+"endDate":null,
+"name":"Kadir Gecesi",
+"hijri":"26 Ramazan",
+"kind":"kandil"
+},
+{
+"date":"2026-03-19",
+"endDate":null,
+"name":"Ramazan Bayramı Arefesi",
+"hijri":"29 Ramazan",
+"kind":"arefe"
+},
+{
+"date":"2026-03-20",
+"endDate":"2026-03-22",
+"name":"Ramazan Bayramı",
+"hijri":"1-2-3 Şevval",
+"kind":"bayram"
+},
+{
+"date":"2026-04-18",
+"endDate":null,
+"name":"Zilkade Başlangıcı",
+"hijri":"1 Zilkade",
+"kind":"ay"
+},
+{
+"date":"2026-05-18",
+"endDate":null,
+"name":"Zilhicce Başlangıcı",
+"hijri":"1 Zilhicce",
+"kind":"ay"
+},
+{
+"date":"2026-05-26",
+"endDate":null,
+"name":"Kurban Bayramı Arefesi",
+"hijri":"9 Zilhicce",
+"kind":"arefe"
+},
+{
+"date":"2026-05-27",
+"endDate":"2026-05-30",
+"name":"Kurban Bayramı",
+"hijri":"10-11-12-13 Zilhicce",
+"kind":"bayram"
+},
+{
+"date":"2026-06-16",
+"endDate":null,
+"name":"Hicri Yılbaşı",
+"hijri":"1 Muharrem",
+"kind":"ozel"
+},
+{
+"date":"2026-06-25",
+"endDate":null,
+"name":"Aşure Günü",
+"hijri":"10 Muharrem",
+"kind":"ozel"
+},
+{
+"date":"2026-07-15",
+"endDate":null,
+"name":"Safer Başlangıcı",
+"hijri":"1 Safer",
+"kind":"ay"
+},
+{
+"date":"2026-08-14",
+"endDate":null,
+"name":"R.Evvel Başlangıcı",
+"hijri":"1 R.Evvel",
+"kind":"ay"
+},
+{
+"date":"2026-08-24",
+"endDate":null,
+"name":"Mevlid Kandili",
+"hijri":"11 R.Evvel",
+"kind":"kandil"
+},
+{
+"date":"2026-09-12",
+"endDate":null,
+"name":"R.Ahir Başlangıcı",
+"hijri":"1 R.Ahir",
+"kind":"ay"
+},
+{
+"date":"2026-10-12",
+"endDate":null,
+"name":"C.Evvel Başlangıcı",
+"hijri":"1 C.Evvel",
+"kind":"ay"
+},
+{
+"date":"2026-11-10",
+"endDate":null,
+"name":"C.Ahir Başlangıcı",
+"hijri":"1 C.Ahir",
+"kind":"ay"
+},
+{
+"date":"2026-12-10",
+"endDate":null,
+"name":"Regaib Kandili",
+"hijri":"1 Receb",
+"kind":"kandil"
+},
+{
+"date":"2026-12-10",
+"endDate":null,
+"name":"Üç Ayların Başlangıcı",
+"hijri":"1 Receb",
+"kind":"ozel"
+},
+{
+"date":"2027-01-04",
+"endDate":null,
+"name":"Miraç Kandili",
+"hijri":"26 Receb",
+"kind":"kandil"
+},
+{
+"date":"2027-01-09",
+"endDate":null,
+"name":"Şaban Başlangıcı",
+"hijri":"1 Şaban",
+"kind":"ay"
+},
+{
+"date":"2027-01-22",
+"endDate":null,
+"name":"Berat Kandili",
+"hijri":"14 Şaban",
+"kind":"kandil"
+},
+{
+"date":"2027-02-08",
+"endDate":null,
+"name":"Ramazan Başlangıcı",
+"hijri":"1 Ramazan",
+"kind":"ozel"
+},
+{
+"date":"2027-03-05",
+"endDate":null,
+"name":"Kadir Gecesi",
+"hijri":"26 Ramazan",
+"kind":"kandil"
+},
+{
+"date":"2027-03-08",
+"endDate":null,
+"name":"Ramazan Bayramı Arefesi",
+"hijri":"29 Ramazan",
+"kind":"arefe"
+},
+{
+"date":"2027-03-09",
+"endDate":"2027-03-11",
+"name":"Ramazan Bayramı",
+"hijri":"1-2-3 Şevval",
+"kind":"bayram"
+},
+{
+"date":"2027-04-08",
+"endDate":null,
+"name":"Zilkade Başlangıcı",
+"hijri":"1 Zilkade",
+"kind":"ay"
+},
+{
+"date":"2027-05-07",
+"endDate":null,
+"name":"Zilhicce Başlangıcı",
+"hijri":"1 Zilhicce",
+"kind":"ay"
+},
+{
+"date":"2027-05-15",
+"endDate":null,
+"name":"Kurban Bayramı Arefesi",
+"hijri":"9 Zilhicce",
+"kind":"arefe"
+},
+{
+"date":"2027-05-16",
+"endDate":"2027-05-19",
+"name":"Kurban Bayramı",
+"hijri":"10-11-12-13 Zilhicce",
+"kind":"bayram"
+},
+{
+"date":"2027-06-06",
+"endDate":null,
+"name":"Hicri Yılbaşı",
+"hijri":"1 Muharrem",
+"kind":"ozel"
+},
+{
+"date":"2027-06-15",
+"endDate":null,
+"name":"Aşure Günü",
+"hijri":"10 Muharrem",
+"kind":"ozel"
+},
+{
+"date":"2027-07-05",
+"endDate":null,
+"name":"Safer Başlangıcı",
+"hijri":"1 Safer",
+"kind":"ay"
+},
+{
+"date":"2027-08-03",
+"endDate":null,
+"name":"R.Evvel Başlangıcı",
+"hijri":"1 R.Evvel",
+"kind":"ay"
+},
+{
+"date":"2027-08-13",
+"endDate":null,
+"name":"Mevlid Kandili",
+"hijri":"11 R.Evvel",
+"kind":"kandil"
+},
+{
+"date":"2027-09-02",
+"endDate":null,
+"name":"R.Ahir Başlangıcı",
+"hijri":"1 R.Ahir",
+"kind":"ay"
+},
+{
+"date":"2027-10-01",
+"endDate":null,
+"name":"C.Evvel Başlangıcı",
+"hijri":"1 C.Evvel",
+"kind":"ay"
+},
+{
+"date":"2027-10-31",
+"endDate":null,
+"name":"C.Ahir Başlangıcı",
+"hijri":"1 C.Ahir",
+"kind":"ay"
+},
+{
+"date":"2027-11-29",
+"endDate":null,
+"name":"Üç Ayların Başlangıcı",
+"hijri":"1 Receb",
+"kind":"ozel"
+},
+{
+"date":"2027-12-02",
+"endDate":null,
+"name":"Regaib Kandili",
+"hijri":"4 Receb",
+"kind":"kandil"
+},
+{
+"date":"2027-12-24",
+"endDate":null,
+"name":"Miraç Kandili",
+"hijri":"26 Receb",
+"kind":"kandil"
+},
+{
+"date":"2027-12-29",
+"endDate":null,
+"name":"Şaban Başlangıcı",
+"hijri":"1 Şaban",
+"kind":"ay"
+},
+{
+"date":"2028-01-28",
+"endDate":null,
+"name":"Ramazan Başlangıcı",
+"hijri":"1 Ramazan",
+"kind":"ozel"
+},
+{
+"date":"2028-02-25",
+"endDate":null,
+"name":"Ramazan Bayramı Arefesi",
+"hijri":"29 Ramazan",
+"kind":"arefe"
+},
+{
+"date":"2028-02-26",
+"endDate":"2028-02-28",
+"name":"Ramazan Bayramı",
+"hijri":"1-2-3 Şevval",
+"kind":"bayram"
+},
+{
+"date":"2028-03-27",
+"endDate":null,
+"name":"Zilkade Başlangıcı",
+"hijri":"1 Zilkade",
+"kind":"ay"
+},
+{
+"date":"2028-04-26",
+"endDate":null,
+"name":"Zilhicce Başlangıcı",
+"hijri":"1 Zilhicce",
+"kind":"ay"
+},
+{
+"date":"2028-05-04",
+"endDate":null,
+"name":"Kurban Bayramı Arefesi",
+"hijri":"9 Zilhicce",
+"kind":"arefe"
+},
+{
+"date":"2028-05-05",
+"endDate":"2028-05-08",
+"name":"Kurban Bayramı",
+"hijri":"10-11-12-13 Zilhicce",
+"kind":"bayram"
+},
+{
+"date":"2028-05-25",
+"endDate":null,
+"name":"Hicri Yılbaşı",
+"hijri":"1 Muharrem",
+"kind":"ozel"
+},
+{
+"date":"2028-06-03",
+"endDate":null,
+"name":"Aşure Günü",
+"hijri":"10 Muharrem",
+"kind":"ozel"
+},
+{
+"date":"2028-06-24",
+"endDate":null,
+"name":"Safer Başlangıcı",
+"hijri":"1 Safer",
+"kind":"ay"
+},
+{
+"date":"2028-07-23",
+"endDate":null,
+"name":"R.Evvel Başlangıcı",
+"hijri":"1 R.Evvel",
+"kind":"ay"
+},
+{
+"date":"2028-08-21",
+"endDate":null,
+"name":"R.Ahir Başlangıcı",
+"hijri":"1 R.Ahir",
+"kind":"ay"
+},
+{
+"date":"2028-09-20",
+"endDate":null,
+"name":"C.Evvel Başlangıcı",
+"hijri":"1 C.Evvel",
+"kind":"ay"
+},
+{
+"date":"2028-10-19",
+"endDate":null,
+"name":"C.Ahir Başlangıcı",
+"hijri":"1 C.Ahir",
+"kind":"ay"
+},
+{
+"date":"2028-11-18",
+"endDate":null,
+"name":"Üç Ayların Başlangıcı",
+"hijri":"1 Receb",
+"kind":"ozel"
+},
+{
+"date":"2028-12-17",
+"endDate":null,
+"name":"Şaban Başlangıcı",
+"hijri":"1 Şaban",
+"kind":"ay"
+}
+]
+}

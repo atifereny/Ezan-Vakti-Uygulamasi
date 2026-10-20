@@ -1,7 +1,7 @@
 name: application
 description: "Ezan Vakti - Namaz Vakitleri Uygulaması"
 publish_to: 'none'
-version: 0.1.0
+version: 1.1.0+2
 
 environment:
   sdk: ^3.10.8
@@ -32,6 +32,7 @@ dependencies:
   hijri: ^3.0.1
   # Pusula sensörü için
   flutter_compass: ^0.8.1
+  package_info_plus: ^10.2.2
 
 dev_dependencies:
   flutter_test:
@@ -47,6 +48,16 @@ flutter:
     - assets/images/cami_dark.svg
     - assets/images/zikirmatik.svg
     - assets/images/zikirmatik_dark.svg
+    - assets/data/tr_mosques.json
+    - assets/data/dini_gunler.json
+    - assets/data/dualar.json
+    - assets/data/kuran.json
+
+  fonts:
+    # Kur'an metni için (SIL Open Font License; lisans: assets/fonts/AmiriQuran-OFL.txt)
+    - family: AmiriQuran
+      fonts:
+        - asset: assets/fonts/AmiriQuran-Regular.ttf
 
 flutter_launcher_icons:
   android: true

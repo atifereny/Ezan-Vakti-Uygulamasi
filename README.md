@@ -32,11 +32,45 @@ Türkiye'deki namaz vakitlerini takip etmek için geliştirilmiş Flutter uygula
 - Kaçan ibadetleri kayıt altında tutar
 
 ### Yakınımdaki Camiler
-- 2 km çevresindeki camileri listeler
+- 2 km çevresindeki camileri harita ve liste olarak gösterir
+- Türkiye'deki camilerin (OpenStreetMap) listesi uygulamanın içinde gömülü: internet olmadan da anında açılır
+- İnternet varsa güncel veri arka planda alınır; sonuçlar önbelleğe yazılır
+- İsimli camiler listede önce gösterilir
+
+### Kur'an-ı Kerim
+- Medine mushafının 604 sayfası, sûre ve cüz listeleriyle
+- Gerçek bir kitap gibi **sayfa çevirme efekti** (sırt sağda, mushaf yönünde)
+- Arapça (mushaf görünümü) ve ayet ayet **Diyanet meali** görünümü
+- Ayete dokununca Arapça, meal ve Diyanet Kur'an Portalı'nda tefsire bağlantı
+- Kaldığın sayfayı hatırlar
+
+### Dualar
+- Kur'an ve hadislerden 36 dua: Arapça, okunuş, meal ve kaynak
+- Meal ve künyeler Diyanet yayınlarından; arama ve ayet/hadis filtresi
+
+### Dini Günler
+- Diyanet'in resmî takvimine göre kandiller, bayramlar, arefe, Ramazan ve diğer dini günler
+- Ana ekranda bugün/yarın bir dini gün varsa bilgi şeridi ("Yarın akşam Miraç Kandili", "Ramazan Bayramı'nın 2. günü")
 
 ### Bildirimler
 - Namaz vakti bildirimleri
 - Her vakit için ayrı ayrı açılıp kapatılabilir
+
+### Güncelleme Kontrolü
+- Açılışta GitHub'daki son sürüme bakar; yeni sürüm varsa indirme sayfasına yönlendirir
+
+---
+
+## Veri Dosyalarını Yenileme
+
+Release öncesi çalıştırılır (proje kökünden):
+
+```bash
+python tools/build_mosque_data.py   # Türkiye cami listesi (OpenStreetMap)
+python tools/build_dini_gunler.py   # Diyanet dini gün takvimi
+```
+
+Kur'an verisi (`assets/data/kuran.json`) `tools/build_quran_data.py` ile üretilir. Kur'an yazı tipi: Amiri Quran (SIL OFL).
 
 ---
 
@@ -44,7 +78,7 @@ Türkiye'deki namaz vakitlerini takip etmek için geliştirilmiş Flutter uygula
 
 - **Framework:** Flutter
 - **Platform:** Android (iOS desteği yakında)
-- **Minimum Android:** API 21 (Android 5.0)
+- **Minimum Android:** API 24 (Android 7.0)
 - **Widget:** home_widget paketi, `HomeWidgetProvider` tabanlı
 
 ---

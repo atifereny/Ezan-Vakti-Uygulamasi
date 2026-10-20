@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart' show LaunchMode, launchUrl;
 
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/location_utils.dart';
@@ -9,6 +10,7 @@ import '../../data/services/geocoding_service.dart';
 import '../../data/services/location_service.dart';
 import '../../data/services/prayer_times_service.dart';
 import '../../data/services/storage_service.dart';
+import '../../data/services/update_service.dart';
 import '../../data/services/notification_service.dart';
 import '../../data/services/widget_service.dart';
 import '../../domain/models/prayer_times.dart';
@@ -34,6 +36,7 @@ class _MainScreenState extends State<MainScreen> {
   final _prayerTimesService = PrayerTimesService();
   final _geocodingService = GeocodingService();
   final _widgetService = WidgetService();
+  final _updateService = UpdateService();
 
   // ── Paylaşılan State ──────────────────────────────────────────────────────────
   SavedLocation? _savedLocation;
@@ -53,6 +56,43 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _initialize();
+    _checkForUpdate();
+  }
+
+  // ── Güncelleme kontrolü (GitHub release) ──────────────────────────────────────
+
+  Future<void> _checkForUpdate() async {
+    final update = await _updateService.checkForUpdate();
+    if (update == null || !mounted) return;
+
+    final go = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Yeni sürüm mevcut'),
+        content: SingleChildScrollView(
+          child: Text(
+            'Ezan Vakti ${update.version} yayınlandı.'
+            '${update.notes.isEmpty ? '' : '\n\n${update.notes}'}',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Sonra'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('İndir'),
+          ),
+        ],
+      ),
+    );
+
+    if (go == true) {
+      await launchUrl(Uri.parse(update.url), mode: LaunchMode.externalApplication);
+    } else {
+      await _updateService.dismiss(update.version);
+    }
   }
 
   @override

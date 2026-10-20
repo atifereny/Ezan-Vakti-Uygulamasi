@@ -40,12 +40,12 @@ class _NearbyMosquesScreenState extends State<NearbyMosquesScreen> {
       _selectedId = null;
     });
 
-    final pos = await _locationService.getCurrentPosition();
+    final pos = await _locationService.getQuickPosition();
     if (!mounted) return;
 
     if (pos == null) {
       setState(() {
-        _error = 'Konum alınamadı.\nLütfen konum iznini açık olduğunu kontrol edin.';
+        _error = 'Konum alınamadı.\nKonum servisinin ve izninin açık olduğunu kontrol edin.';
         _loading = false;
       });
       return;
@@ -54,26 +54,44 @@ class _NearbyMosquesScreenState extends State<NearbyMosquesScreen> {
     _userLat = pos.latitude;
     _userLng = pos.longitude;
 
+    // 1) Gömülü veri: internetsiz ve anında
+    final local = await _mosqueService.fetchLocal(pos.latitude, pos.longitude);
+    if (!mounted) return;
+    if (local.isNotEmpty) {
+      setState(() {
+        _mosques = local;
+        _loading = false;
+      });
+      _centerMap(pos.latitude, pos.longitude);
+    }
+
+    // 2) Ağ/önbellek: daha güncel liste gelirse onunla değiştir
     try {
-      final mosques = await _mosqueService.fetchNearby(pos.latitude, pos.longitude);
+      final mosques =
+          await _mosqueService.fetchNearby(pos.latitude, pos.longitude);
       if (!mounted) return;
       setState(() {
         _mosques = mosques;
+        if (!mosques.any((m) => m.id == _selectedId)) _selectedId = null;
         _loading = false;
       });
-      // Haritayı konuma götür
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _mapCtrl.move(LatLng(pos.latitude, pos.longitude), 14.5);
-        }
-      });
-    } catch (_) {
+      if (local.isEmpty) _centerMap(pos.latitude, pos.longitude);
+    } catch (e) {
       if (!mounted) return;
+      if (local.isNotEmpty) return; // gömülü liste zaten gösteriliyor
       setState(() {
-        _error = 'Camiler yüklenemedi.\nİnternet bağlantınızı kontrol edin.';
+        _error = e is MosqueException
+            ? e.message
+            : 'Camiler yüklenemedi.\nLütfen tekrar deneyin.';
         _loading = false;
       });
     }
+  }
+
+  void _centerMap(double lat, double lng) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _mapCtrl.move(LatLng(lat, lng), 14.5);
+    });
   }
 
   void _select(Mosque m) {
@@ -140,17 +158,19 @@ class _NearbyMosquesScreenState extends State<NearbyMosquesScreen> {
                     // Cami pinleri
                     ..._mosques.map((m) {
                       final sel = m.id == _selectedId;
+                      final dim = m.isUnnamed && !sel;
                       return Marker(
                         point: LatLng(m.lat, m.lng),
-                        width: sel ? 46 : 36,
-                        height: sel ? 46 : 36,
+                        width: sel ? 46 : (dim ? 28 : 36),
+                        height: sel ? 46 : (dim ? 28 : 36),
                         child: GestureDetector(
                           onTap: () => _select(m),
                           child: Container(
                             decoration: BoxDecoration(
                               color: sel
                                   ? cs.primary
-                                  : cs.primary.withValues(alpha: 0.82),
+                                  : cs.primary
+                                      .withValues(alpha: dim ? 0.5 : 0.82),
                               shape: BoxShape.circle,
                               border: sel
                                   ? Border.all(color: Colors.white, width: 2)
@@ -164,7 +184,8 @@ class _NearbyMosquesScreenState extends State<NearbyMosquesScreen> {
                               ],
                             ),
                             child: Icon(Icons.mosque,
-                                color: Colors.white, size: sel ? 24 : 18),
+                                color: Colors.white,
+                                size: sel ? 24 : (dim ? 14 : 18)),
                           ),
                         ),
                       );
@@ -267,7 +288,7 @@ class _NearbyMosquesScreenState extends State<NearbyMosquesScreen> {
                           Icon(Icons.mosque, color: cs.primary, size: 18),
                           const SizedBox(width: 8),
                           Text(
-                            '${_mosques.length} cami bulundu  ·  2 km içinde',
+                            _headerText(),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
@@ -322,17 +343,21 @@ class _NearbyMosquesScreenState extends State<NearbyMosquesScreen> {
                                     ),
                                   ),
                                   title: Text(
-                                    m.name,
+                                    m.isUnnamed ? 'Cami' : m.name,
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: sel
                                           ? FontWeight.w600
                                           : FontWeight.normal,
-                                      color: cs.onSurface,
+                                      color: m.isUnnamed
+                                          ? cs.onSurface.withValues(alpha: 0.7)
+                                          : cs.onSurface,
                                     ),
                                   ),
                                   subtitle: Text(
-                                    _fmtDist(m.distanceKm),
+                                    m.isUnnamed
+                                        ? 'Adı kayıtlı değil  ·  ${_fmtDist(m.distanceKm)}'
+                                        : _fmtDist(m.distanceKm),
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: cs.onSurface.withValues(alpha: 0.55),
@@ -356,6 +381,12 @@ class _NearbyMosquesScreenState extends State<NearbyMosquesScreen> {
         ],
       ),
     );
+  }
+
+  String _headerText() {
+    final unnamed = _mosques.where((m) => m.isUnnamed).length;
+    final base = '${_mosques.length} cami  ·  2 km içinde';
+    return unnamed == 0 ? base : '$base  ·  $unnamed adsız';
   }
 
   String _fmtDist(double km) {

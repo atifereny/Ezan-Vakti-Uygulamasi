@@ -1,4 +1,6 @@
 class Mosque {
+  static const unnamedLabel = 'İsimsiz Cami';
+
   final String id;
   final String name;
   final double lat;
@@ -12,4 +14,7 @@ class Mosque {
     required this.lng,
     required this.distanceKm,
   });
+
+  /// OSM'de adı kayıtlı olmayan cami (name boş ya da yer tutucu)
+  bool get isUnnamed => name.isEmpty || name == unnamedLabel;
 }

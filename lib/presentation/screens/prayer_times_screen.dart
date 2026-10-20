@@ -5,6 +5,7 @@ import 'package:hijri/hijri_calendar.dart';
 import '../../domain/models/notification_prefs.dart';
 import '../../domain/models/prayer_times.dart';
 import '../widgets/countdown_card.dart';
+import '../widgets/dini_gun_banner.dart';
 import '../widgets/prayer_times_card.dart';
 
 class PrayerTimesScreen extends StatelessWidget {
@@ -108,6 +109,11 @@ class PrayerTimesScreen extends StatelessWidget {
                   tomorrowFajr: tomorrowFajr,
                   heroMode: true,
                 ),
+              ),
+              // Dini gün bildirimi (alt; bugün/yarın bir dini gün yoksa görünmez)
+              const Positioned(
+                bottom: 6, left: 16, right: 16,
+                child: Center(child: DiniGunBanner()),
               ),
             ],
           ),

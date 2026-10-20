@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'dini_gunler_screen.dart';
+import 'dualar_screen.dart';
 import 'kaza_screen.dart';
 import 'kible_screen.dart';
 import 'nearby_mosques_screen.dart';
+import 'quran_screen.dart';
 import 'zikirmatik_screen.dart';
 
 class FeaturesScreen extends StatelessWidget {
@@ -61,6 +64,33 @@ class FeaturesScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (_) => const NearbyMosquesScreen()),
+              ),
+            ),
+            _FeatureCard(
+              icon: Icons.auto_stories_outlined,
+              title: 'Kur’an-ı Kerim',
+              subtitle: 'Arapça ve Diyanet meali',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const QuranScreen()),
+              ),
+            ),
+            _FeatureCard(
+              icon: Icons.menu_book_outlined,
+              title: 'Dualar',
+              subtitle: 'Ayet ve hadis duaları',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DualarScreen()),
+              ),
+            ),
+            _FeatureCard(
+              icon: Icons.event_outlined,
+              title: 'Dini Günler',
+              subtitle: 'Kandil ve bayram takvimi',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DiniGunlerScreen()),
               ),
             ),
             ..._comingSoon.map(
