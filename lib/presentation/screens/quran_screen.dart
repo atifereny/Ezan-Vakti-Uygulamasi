@@ -4,6 +4,7 @@ import '../../data/services/dua_service.dart';
 import '../../data/services/quran_service.dart';
 import '../../domain/models/quran.dart';
 import 'quran_reader_screen.dart';
+import '../widgets/quran_page_view.dart' show kQuranFont;
 
 /// Kur'an-ı Kerim ana sayfası: kaldığın yer, sûreler ve cüzler
 class QuranScreen extends StatefulWidget {
@@ -173,7 +174,7 @@ class _QuranScreenState extends State<QuranScreen> {
           child: Text(
             s.arabicName.replaceFirst('سُورَةُ ', ''),
             style: TextStyle(
-              fontFamily: 'AmiriQuran',
+              fontFamily: kQuranFont,
               fontSize: 21,
               color: cs.primary,
             ),

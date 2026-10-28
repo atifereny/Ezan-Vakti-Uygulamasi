@@ -22,8 +22,34 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
   late int _page = widget.startPage;
   QuranMode _mode = QuranMode.mushaf;
   QuranAyah? _selected;
+  String _font = kQuranFont;
 
   QuranData get _data => widget.data;
+
+  @override
+  void initState() {
+    super.initState();
+    QuranService.savedFont().then((f) {
+      if (!mounted || f == null) return;
+      if (kQuranFonts.any((o) => o.family == f)) setState(() => _font = f);
+    });
+  }
+
+  void _pickFont() {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      builder: (ctx) => _FontSheet(
+        selected: _font,
+        onSelected: (family) {
+          Navigator.pop(ctx);
+          setState(() => _font = family);
+          QuranService.saveFont(family);
+        },
+      ),
+    );
+  }
 
   void _onPageChanged(int index) {
     setState(() {
@@ -38,32 +64,10 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
   }
 
   Future<void> _showJumpDialog() async {
-    final ctrl = TextEditingController(text: '$_page');
     final page = await showDialog<int>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Sayfaya git'),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          decoration: InputDecoration(
-            hintText: '1 - ${_data.pageCount}',
-            border: const OutlineInputBorder(),
-          ),
-          onSubmitted: (v) => Navigator.pop(ctx, int.tryParse(v)),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, int.tryParse(ctrl.text)),
-            child: const Text('Git'),
-          ),
-        ],
-      ),
+      builder: (_) => _JumpDialog(initial: _page, pageCount: _data.pageCount),
     );
-    ctrl.dispose();
     if (page != null && page >= 1 && page <= _data.pageCount) _jumpToPage(page);
   }
 
@@ -74,7 +78,7 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
       isScrollControlled: true,
       showDragHandle: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      builder: (_) => _AyahSheet(data: _data, ayah: a),
+      builder: (_) => _AyahSheet(data: _data, ayah: a, fontFamily: _font),
     ).whenComplete(() {
       if (mounted) setState(() => _selected = null);
     });
@@ -113,6 +117,11 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
             }),
           ),
           IconButton(
+            tooltip: 'Yazı tipi',
+            icon: const Icon(Icons.text_fields),
+            onPressed: _pickFont,
+          ),
+          IconButton(
             tooltip: 'Sayfaya git',
             icon: const Icon(Icons.pin_outlined),
             onPressed: _showJumpDialog,
@@ -144,6 +153,7 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
                       initialIndex: widget.startPage - 1,
                       onPageChanged: _onPageChanged,
                       builder: (context, i) => QuranPageView(
+                        fontFamily: _font,
                         data: _data,
                         page: i + 1,
                         mode: _mode,
@@ -163,6 +173,148 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Yazı tipi seçim sayfası: her seçenek kendi yazı tipiyle önizlenir.
+class _FontSheet extends StatelessWidget {
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  const _FontSheet({required this.selected, required this.onSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(left: 4, bottom: 8),
+              child: Text('Yazı tipi',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+            ),
+            for (final o in kQuranFonts)
+              Card(
+                elevation: 0,
+                margin: const EdgeInsets.only(bottom: 8),
+                color: o.family == selected
+                    ? cs.primary.withValues(alpha: 0.12)
+                    : cs.surfaceContainerHighest.withValues(alpha: 0.4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(
+                    color: o.family == selected
+                        ? cs.primary
+                        : cs.outline.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => onSelected(o.family),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text.rich(TextSpan(children: [
+                                TextSpan(
+                                  text: o.label,
+                                  style: const TextStyle(
+                                      fontSize: 14.5, fontWeight: FontWeight.w600),
+                                ),
+                                TextSpan(
+                                  text: '  ${o.note}',
+                                  style: TextStyle(
+                                      fontSize: 11.5,
+                                      color: cs.onSurface.withValues(alpha: 0.6)),
+                                ),
+                              ])),
+                            ),
+                            if (o.family == selected)
+                              Icon(Icons.check_circle, color: cs.primary, size: 20),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        SizedBox(
+                          width: double.infinity,
+                          child: Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: Text(
+                              'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontFamily: o.family, fontSize: 21, height: 1.9),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Sayfaya git" diyaloğu. Kontrolcüyü kendisi yönetir; diyalog kapanış
+/// animasyonu bitmeden dispose edilmesin diye State içinde tutulur.
+class _JumpDialog extends StatefulWidget {
+  final int initial;
+  final int pageCount;
+
+  const _JumpDialog({required this.initial, required this.pageCount});
+
+  @override
+  State<_JumpDialog> createState() => _JumpDialogState();
+}
+
+class _JumpDialogState extends State<_JumpDialog> {
+  late final TextEditingController _ctrl =
+      TextEditingController(text: '${widget.initial}');
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Sayfaya git'),
+      content: TextField(
+        controller: _ctrl,
+        autofocus: true,
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: InputDecoration(
+          hintText: '1 - ${widget.pageCount}',
+          border: const OutlineInputBorder(),
+        ),
+        onSubmitted: (v) => Navigator.pop(context, int.tryParse(v)),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('İptal'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, int.tryParse(_ctrl.text)),
+          child: const Text('Git'),
+        ),
+      ],
     );
   }
 }
@@ -209,8 +361,9 @@ class _PageSlider extends StatelessWidget {
 class _AyahSheet extends StatelessWidget {
   final QuranData data;
   final QuranAyah ayah;
+  final String fontFamily;
 
-  const _AyahSheet({required this.data, required this.ayah});
+  const _AyahSheet({required this.data, required this.ayah, required this.fontFamily});
 
   @override
   Widget build(BuildContext context) {
@@ -270,7 +423,7 @@ class _AyahSheet extends StatelessWidget {
               '${ayah.arabic} ﴿${QuranService.arabicDigits(ayah.number)}﴾',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: kQuranFont,
+                fontFamily: fontFamily,
                 fontSize: 27,
                 height: 2.0,
                 color: cs.onSurface,

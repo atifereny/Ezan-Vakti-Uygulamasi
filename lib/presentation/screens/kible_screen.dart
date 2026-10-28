@@ -3,8 +3,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../data/services/location_service.dart';
 import '../../data/services/storage_service.dart';
 
 class KibleScreen extends StatefulWidget {
@@ -19,6 +21,12 @@ class _KibleScreenState extends State<KibleScreen> {
   double? _heading;
   double? _qiblaAngle;
   bool _locationLoaded = false;
+  bool _locating = false;
+  bool _freshLocation = false;
+  double? _accuracy; // ±derece; Android'de 15/30/45, bilinmiyorsa null
+
+  // Orta ve düşük doğrulukta (≥30°) kalibrasyon uyarısı gösterilir
+  bool get _needsCalibration => _accuracy != null && _accuracy! >= 30;
 
   // Kâbe koordinatları
   static const double _kaabaLat = 21.4225;
@@ -30,7 +38,10 @@ class _KibleScreenState extends State<KibleScreen> {
     _loadLocation();
     _compassSub = FlutterCompass.events?.listen((event) {
       if (mounted && event.heading != null) {
-        setState(() => _heading = event.heading);
+        setState(() {
+          _heading = event.heading;
+          _accuracy = event.accuracy;
+        });
       }
     });
   }
@@ -41,6 +52,8 @@ class _KibleScreenState extends State<KibleScreen> {
     super.dispose();
   }
 
+  // Önce kaydedilen konumla hemen gösterir, ardından cihazdan güncel konumu
+  // alıp yönü yeniler. Konum alınamazsa kaydedilen konumla devam edilir.
   Future<void> _loadLocation() async {
     final saved = await StorageService().loadLocation();
     if (!mounted) return;
@@ -49,6 +62,20 @@ class _KibleScreenState extends State<KibleScreen> {
         _qiblaAngle = _calculateQibla(saved.latitude, saved.longitude);
       }
       _locationLoaded = true;
+      _locating = true;
+    });
+
+    Position? fresh;
+    try {
+      fresh = await LocationService().getQuickPosition();
+    } catch (_) {}
+    if (!mounted) return;
+    setState(() {
+      _locating = false;
+      if (fresh != null) {
+        _qiblaAngle = _calculateQibla(fresh.latitude, fresh.longitude);
+        _freshLocation = true;
+      }
     });
   }
 
@@ -105,7 +132,20 @@ class _KibleScreenState extends State<KibleScreen> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 4),
+        Text(
+          _locating
+              ? 'Konum güncelleniyor...'
+              : _freshLocation
+                  ? 'Güncel konumunuza göre'
+                  : 'Kayıtlı konumunuza göre',
+          style: const TextStyle(color: kMuted, fontSize: 12),
+        ),
+        if (_needsCalibration) ...[
+          const SizedBox(height: 16),
+          const _CalibrationNotice(),
+        ],
+        const SizedBox(height: 32),
         Center(
           child: SizedBox(
             width: 280,
@@ -126,6 +166,36 @@ class _KibleScreenState extends State<KibleScreen> {
           style: const TextStyle(color: kMuted, fontSize: 13),
         ),
       ],
+    );
+  }
+}
+
+class _CalibrationNotice extends StatelessWidget {
+  const _CalibrationNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: kPrimary.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: kPrimary.withValues(alpha: 0.4)),
+      ),
+      child: const Row(
+        children: [
+          Icon(Icons.all_inclusive, color: kPrimary, size: 22),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Pusula doğruluğu düşük. Telefonu havada 8 çizerek '
+              'kalibre edin; metal ve mıknatıslardan uzak durun.',
+              style: TextStyle(color: kPrimary, fontSize: 13),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

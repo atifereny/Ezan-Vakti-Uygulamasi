@@ -43,6 +43,7 @@ Türkiye'deki namaz vakitlerini takip etmek için geliştirilmiş Flutter uygula
 - Arapça (mushaf görünümü) ve ayet ayet **Diyanet meali** görünümü
 - Ayete dokununca Arapça, meal ve Diyanet Kur'an Portalı'nda tefsire bağlantı
 - Kaldığın sayfayı hatırlar
+- Üstteki **Aa** düğmesiyle 4 yazı tipi arasından seçim: Klasik nesih (Scheherazade New), Klasik matbaa (Amiri), Kur'an hattı (Amiri Quran), Sade nesih (Noto Naskh Arabic); seçim hatırlanır
 
 ### Dualar
 - Kur'an ve hadislerden 36 dua: Arapça, okunuş, meal ve kaynak
@@ -70,7 +71,7 @@ python tools/build_mosque_data.py   # Türkiye cami listesi (OpenStreetMap)
 python tools/build_dini_gunler.py   # Diyanet dini gün takvimi
 ```
 
-Kur'an verisi (`assets/data/kuran.json`) `tools/build_quran_data.py` ile üretilir. Kur'an yazı tipi: Amiri Quran (SIL OFL).
+Kur'an verisi (`assets/data/kuran.json`) `tools/build_quran_data.py` ile üretilir. Kur'an yazı tipleri: Scheherazade New, Amiri, Amiri Quran, Noto Naskh Arabic (hepsi SIL OFL; lisanslar `assets/fonts/`).
 
 ---
 

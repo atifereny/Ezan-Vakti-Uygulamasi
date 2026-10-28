@@ -9,6 +9,7 @@ import '../../domain/models/quran.dart';
 /// Gömülü Kur'an verisini (assets/data/kuran.json) okur ve son okunan sayfayı saklar.
 class QuranService {
   static const _lastPageKey = 'quran_last_page';
+  static const _fontKey = 'quran_font';
   static QuranData? _cache;
 
   static Future<QuranData> load() async {
@@ -63,6 +64,21 @@ class QuranService {
   static Future<void> saveLastPage(int page) async {
     try {
       await (await SharedPreferences.getInstance()).setInt(_lastPageKey, page);
+    } catch (_) {}
+  }
+
+  /// Seçili Kur'an yazı tipi (aile adı); yoksa null
+  static Future<String?> savedFont() async {
+    try {
+      return (await SharedPreferences.getInstance()).getString(_fontKey);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> saveFont(String family) async {
+    try {
+      await (await SharedPreferences.getInstance()).setString(_fontKey, family);
     } catch (_) {}
   }
 
